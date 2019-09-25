@@ -37,7 +37,7 @@ function SetLatLngElev(){
   var request = {locations: new Array(latlng)}
   elevationObj.getElevationForLocations(request, function(response, status){
     if(status == google.maps.ElevationStatus.OK){
-      document.getElementById("elevInput") = response[0].elevation;
+      document.getElementById("elevInput").value = String(response[0].elevation);
     }else{
       alert("Could not get elevation");
     }
