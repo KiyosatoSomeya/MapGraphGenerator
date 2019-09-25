@@ -1,0 +1,22 @@
+body {
+  width: 100%;
+}
+
+h1 {
+    height: auto;
+    margin: 40px 0 0 20px;
+    padding: 0;
+    color: #000;
+    font-size: 30px;
+    font-weight: bold;
+    border-top: 0;
+    line-height: 1.5;
+}
+
+
+/* 地図のサイズ */
+#map {
+  height: 400px;
+  width: 600px;
+  margin: 40px 0 0 20px;
+}
