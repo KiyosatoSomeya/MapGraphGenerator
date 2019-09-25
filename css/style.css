@@ -1,22 +1,161 @@
+
 body {
+  font-family: 'Marvel', sans-serif;
   width: 100%;
+  background-color: #DCD6C7
 }
 
 h1 {
-    height: auto;
-    margin: 40px 0 0 20px;
-    padding: 0;
-    color: #000;
-    font-size: 30px;
-    font-weight: bold;
-    border-top: 0;
-    line-height: 1.5;
+  height: auto;
+  margin: 10px 20px;
+  padding: 0;
+  color: #000;
+  font-size: 60px;
+  border-top: 0;
 }
-
 
 /* 地図のサイズ */
 #map {
   height: 400px;
   width: 600px;
-  margin: 40px 0 0 20px;
+  margin: 10px 20px;
 }
+
+/* 左右の段組 */
+#block_left{
+  float: left;
+  width: 620px;
+}
+
+#block_right{
+  float: left;
+  width: 220px;
+}
+
+#button_wrapper{
+  clear: both;
+  text-align: center;
+}
+
+#selecting_node_panel{
+  height: auto;
+  width: 200px;
+  margin: 10px 20px;
+  padding: 20px;
+  background-color: #F2F2F2;
+  border-radius: 10px;
+}
+
+#new_panel_area{
+  width: 600px;
+  margin: 10px 20px;
+  padding: 0;
+}
+
+label.new_panel_tab{
+  display: block;
+  float: left;
+  height: 35px;
+  width: 80px;
+  background-color: #BAB5A9;
+  border-radius: 10px 10px 0 0;
+  color: #F2F2F2;
+  font-size: 25px;
+  text-align: center;
+}
+
+#new_panel_area input:checked + label.new_panel_tab{
+  background-color: #636262;
+}
+
+#new_panel_tabs{
+  height: 40px;
+}
+
+div.new_panel{
+  display: none;
+  clear: both;
+  padding: 20px;
+  background-color: #636262;
+  color: #F2F2F2;
+  font-size: 20px;
+  line-height:180%;
+}
+
+#node_tab:checked ~ #node_content,
+#edge_tab:checked ~ #edge_content{
+  display: block;
+}
+
+
+#new_panel_left{
+  width: 100px;
+  float: left;
+}
+
+#new_panel_right{
+  float: left;
+}
+
+#new_panel_input_button{
+  background: none;
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  font-family: 'Marvel', sans-serif;
+
+  width: 215px;
+  margin: 0 0 0 30px;
+  background-color: #EB6447;
+  border-radius: 10px;
+  color: #F2F2F2;
+  font-size: 20px;
+}
+
+#new_panel_create_button{
+  background: none;
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  font-family: 'Marvel', sans-serif;
+
+  height: 40px;
+  width: 300px;
+  margin: 20px 0 0 0;
+  background-color: #EB6447;
+  border-radius: 10px;
+  color: #F2F2F2;
+  font-size: 25px;
+  text-align: center;
+}
+
+input.short{
+  background-color: #F2F2F2;
+  width: 150px;
+  font-size: 18px;
+}
+
+input.long{
+  background-color: #F2F2F2;
+  width: 400px;
+  font-size: 18px;
+}
+
+input[name=new_panel_tab]{
+  display: none;
+}
+
+#new_panel_input_button:active{
+  background-color: #C1533C;
+}
+
+#new_panel_create_button:active{
+  background-color: #C1533C;
+}
+
