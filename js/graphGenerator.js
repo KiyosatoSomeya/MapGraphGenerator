@@ -31,14 +31,16 @@ function initMap() {
 
 function SetLatLngElev(){
   var latlng = map.getCenter();
-  document.getElementById("latInput").value = String(latlng.lat());
-  document.getElementById("lngInput").value = String(latlng.lng());
 
   var request = {locations: new Array(latlng)}
   elevationObj.getElevationForLocations(request, function(response, status){
     if(status == google.maps.ElevationStatus.OK){
+      document.getElementById("latInput").value = String(latlng.lat());
+      document.getElementById("lngInput").value = String(latlng.lng());
       document.getElementById("elevInput").value = String(response[0].elevation);
     }else{
+      document.getElementById("latInput").value = String(latlng.lat());
+      document.getElementById("lngInput").value = String(latlng.lng());
       alert("Could not get elevation");
     }
   })
