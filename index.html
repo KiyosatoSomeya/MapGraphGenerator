@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Simple Map Sample</title>
+<meta charset="utf-8">
+<style>
+/* マップを表示する div 要素の高さを必ず明示的に指定します。 */
+#map {
+  height: 400px;
+  width: 600px;
+}
+</style>
+</head>
+  
+<body>
+<div id="map"></div><!-- 地図を表示する div 要素（id="map"）-->
+<script>
+  var map;
+  function initMap() {
+  var target = document.getElementById('map');
+
+  //東工大の緯度（latitude）と経度（longitude）
+  map = new google.maps.Map(target, {
+  	center: {lat: 35.605232, lng: 139.683530},
+    zoom: 14
+  });
+  }
+</script> 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9ylnYVRGJ6iUVkMDf75ZkOBfdW5JgqsA&callback=initMap" async defer></script>
+</body>
+</html>
