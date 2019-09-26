@@ -41,8 +41,8 @@ function SetLatLng(){
 }
 
 function SetElev(){
-  var lat = Float.parseFloat(document.getElementById("latInput").value);
-  var lng = Float.parseFloat(document.getElementById("lngInput").value);
+  var lat = parseFloat(document.getElementById("latInput").value);
+  var lng = parseFloat(document.getElementById("lngInput").value);
   var latlng = new google.maps.LatLng(lat, lng);
   var request = {locations: new Array(latlng)};
   elevationObj.getElevationForLocations(request, function(response, status){
@@ -55,9 +55,9 @@ function SetElev(){
 }
 
 function AddNode(){
-  var lat = Float.parseFloat(document.getElementById("latInput").value);
-  var lng = Float.parseFloat(document.getElementById("lngInput").value);
-  var elev = Float.parseFloat(document.getElementById("elevInput").value);
+  var lat = parseFloat(document.getElementById("latInput").value);
+  var lng = parseFloat(document.getElementById("lngInput").value);
+  var elev = parseFloat(document.getElementById("elevInput").value);
   var info = document.getElementById("infoInput").value;
   var newMarker = new google.maps.Marker({
     position: new google.maps.LatLng(lat, lng),
