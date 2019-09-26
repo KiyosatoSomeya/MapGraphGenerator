@@ -64,14 +64,19 @@ function AddNode(){
   var info = document.getElementById("nodeInfoInput").value;
   var newMarker = new google.maps.Marker({  // set marker to the google map
     position: new google.maps.LatLng(lat, lng),
+    animation: google.maps.Animation.DROP,
+    draggable: true,
     map: map
   });
 
   selectingNode = new map_node(node_list.length, lat, lng, value, info, newMarker);
   node_list.push(selectingNode);
 
-  google.maps.event.addListener(markers, 'click', function(e) {
+  google.maps.event.addListener(newMarker, 'click', function(e) {
     SelectNode(selectingNode.index);
+  })
+  google.maps.event.addListener(newMarker, 'dragend', function(e) {
+    SelectNode(selectingNode.index, e.latLng);
   })
 
   // reset input field
@@ -131,4 +136,10 @@ function AddEdge(){
 function SelectNode(index){
   selectingNode = node_list[index];
   alert(String(index) + String(selectingNode.latitude) + string(selectingNode.longitude));
+}
+
+/* This function is called when a marker on the google map is dragend. */
+function MoveNode(index, newLatLng){
+  node_list[index].latitude = newLatLng.lat();
+  node_list[index].longitude = newLatLng.lng();
 }
