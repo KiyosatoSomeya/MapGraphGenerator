@@ -2,9 +2,13 @@ var map;
 var elevationObj;
 var node_list = new Array();
 var edge_list = new Array();
-var selectingNode;
+var selectingNode = null;
 var autoChangeElevation = false;
 var autoChangeDistance = false;
+var marker_icon;
+var marker_icon_info;
+var selected_marker_icon;
+var selected_marker_icon_info;
 
 class Map_node{
   constructor(index, latitude, longitude, value, info, marker){
@@ -18,9 +22,9 @@ class Map_node{
 }
 
 class Map_edge{
-  constructor(node_1_id, node_2_id, value, info, polyLine){
-    this.node_1_id = node_1_id;
-    this.node_2_id = node_2_id;
+  constructor(node_1, node_2, value, info, polyLine){
+    this.node_1 = node_1;
+    this.node_2 = node_2;
     this.value = value;
     this.info = info;
     this.polyLine = polyLine;
@@ -37,6 +41,23 @@ function InitMap() {
     });
 
     elevationObj = new google.maps.ElevationService();
+
+    marker_icon = {
+      url: "img/node.png",
+      scaledSize: new google.maps.Size(25, 25)
+    }
+    marker_icon_info = {
+      url: "img/node_info.png",
+      scaledSize: new google.maps.Size(25, 25)
+    }
+    selected_marker_icon = {
+      url: "img/node_selected.png",
+      scaledSize: new google.maps.Size(40, 40)
+    }
+    selected_marker_icon_info = {
+      url: "img/node_selected_info.png",
+      scaledSize: new google.maps.Size(40, 40)
+    }
 }
 
 function ChangeAutoElevation(){
@@ -77,14 +98,16 @@ function AddNode(){
   var lng = parseFloat(document.getElementById("lngInput").value);
   var value = parseFloat(document.getElementById("elevInput").value);
   var info = document.getElementById("nodeInfoInput").value;
+
   var newMarker = new google.maps.Marker({  // set marker to the google map
     position: new google.maps.LatLng(lat, lng),
     animation: google.maps.Animation.DROP,
+    icon: selected_marker_icon,
     draggable: true,
     map: map
   });
 
-  selectingNode = new Map_node(node_list.length, lat, lng, value, info, newMarker);
+  SwitchSelectingNode(new Map_node(node_list.length, lat, lng, value, info, newMarker));
   node_list.push(selectingNode);
 
   var index = selectingNode.index;
@@ -100,6 +123,27 @@ function AddNode(){
   document.getElementById("lngInput").value = "";
   document.getElementById("elevInput").value = "";
   document.getElementById("nodeInfoInput").value = "";
+
+  SelectDisplay();
+}
+
+function SwitchSelectingNode(newSelectingNode){
+  // unselect now selecting marker
+  if(selectingNode != null){
+    if(selectingNode.info == ""){
+      selectingNode.marker.setIcon(marker_icon);
+    }else{
+      selectingNode.marker.setIcon(marker_icon_info);
+    }
+  }
+
+  selectingNode = newSelectingNode;
+
+  if(selectingNode.info == ""){
+    selectingNode.marker.setIcon(selected_marker_icon);
+  }else{
+    selectingNode.marker.setIcon(selected_marker_icon_info);
+  }
 }
 
 function SetNode1(){
@@ -128,6 +172,11 @@ function AddEdge(){
   var value = parseFloat(document.getElementById("distanceInput").value);
   var info = document.getElementById("edgeInfoInput").value;
 
+  if(id_1 >= node_list.length || id_2 >= node_list.length){
+    alert("Error: ID is out of range.");
+    return;
+  }
+
   // show in the google map
   var node_1 = node_list[id_1];
   var node_2 = node_list[id_2];
@@ -143,40 +192,36 @@ function AddEdge(){
   var polyLine = new google.maps.Polyline(polyLineOptions);
   polyLine.setMap(map);
 
-  var newEdge = new Map_edge(id_1, id_2, value, info, polyLine);
+  var newEdge = new Map_edge(node_1, node_2, value, info, polyLine);
   edge_list.push(newEdge);
+
+  SelectDisplay();
 }
 
 /* This function is called when a marker on the google map is clicked. */
 function SelectNode(index){
-  selectingNode = node_list[index];
+  SwitchSelectingNode(node_list[index]);
+  if(selectingNode.info != ""){
+    new google.maps.InfoWindow({
+            content: selectingNode.info
+    }).open(map, selectingNode.marker);
+  }
+  SelectDisplay();
 }
 
 /* This function is called when a marker on the google map is dragend. */
 function MoveNode(index, newLatLng){
-  selectingNode = node_list[index];
+  SwitchSelectingNode(node_list[index]);
   selectingNode.latitude = newLatLng.lat();
   selectingNode.longitude = newLatLng.lng();
 
-  if(autoChangeElevation){
-    var latlng = new google.maps.LatLng(selectingNode.latitude, selectingNode.longitude);
-    var request = {locations: new Array(latlng)};
-    elevationObj.getElevationForLocations(request, function(response, status){
-      if(status == google.maps.ElevationStatus.OK){
-        selectingNode.value = response[0].elevation;
-      }else{
-        alert("Could not get elevation");
-      }
-    })
-  }
-
   // move poly line
   for(var target_edge of edge_list){
-    if(target_edge.node_1_id == index || target_edge.node_2_id == index){
+    if(target_edge.node_1.index == index || target_edge.node_2.index == index){
       target_edge.polyLine.setMap(null);
 
-      var node_1 = node_list[target_edge.node_1_id];
-      var node_2 = node_list[target_edge.node_2_id];
+      var node_1 = target_edge.node_1
+      var node_2 = target_edge.node_2;
       var path = new Array();
       path.push(new google.maps.LatLng(node_1.latitude, node_1.longitude));
       path.push(new google.maps.LatLng(node_2.latitude, node_2.longitude));
@@ -198,6 +243,113 @@ function MoveNode(index, newLatLng){
       }
     }
   }
+
+  // change evaluation
+  if(autoChangeElevation){
+    var latlng = new google.maps.LatLng(selectingNode.latitude, selectingNode.longitude);
+    var request = {locations: new Array(latlng)};
+    
+    elevationObj.getElevationForLocations(request, function(response, status){
+      if(status == google.maps.ElevationStatus.OK){
+        selectingNode.value = response[0].elevation;
+        SelectDisplay();
+      }else{
+        SelectDisplay();
+        alert("Could not get elevation");
+      }
+    })
+  }else{
+    SelectDisplay();
+  }
 }
 
+function SelectDisplay(){
+  if(selectingNode == null){
+    document.getElementById("select_id").textContent = "-";
+    document.getElementById("select_lat").textContent = "-";
+    document.getElementById("select_lng").textContent = "-";
+    document.getElementById("select_val").textContent = "-";
+    document.getElementById("select_info").textContent = "-";
 
+    document.getElementById("select_edges").innerHTML = "";
+  }else{
+    var index = selectingNode.index;
+    document.getElementById("select_id").textContent = String(index);
+    document.getElementById("select_lat").textContent = String(selectingNode.latitude);
+    document.getElementById("select_lng").textContent = String(selectingNode.longitude);
+    document.getElementById("select_val").textContent = String(selectingNode.value);
+    document.getElementById("select_info").textContent = String(selectingNode.info);
+    var edges_display = "";
+    var edge_count = 0;
+
+    for(var i = 0; i < edge_list.length; i++){
+      var target_edge = edge_list[i];
+      if(target_edge.node_1.index == index || target_edge.node_2.index == index){
+        if(edge_count == 0){
+          edge_count++;
+        }else{
+          // draw line to devide
+          edges_display += '<div class="gray_line_thin"></div>'
+        }
+
+        edges_display += '<div class="select_panel_left">ID:</div><div class="select_panel_right">'+
+        String(target_edge.node_1.index) + '-'+ String(target_edge.node_2.index) +
+        '</div><div class="select_panel_left">Value:</div><div class="select_panel_right">'+
+        String(target_edge.value)+
+        '</div><div class="select_panel_left">Info:</div><div class="select_panel_both">'+
+        target_edge.info+
+        '</div><button type="button" name="deleteEdgeBtn" class="select_panel_delete_button" onclick="DeleteEdge('+
+        String(i)+
+        ')">Delete Edge</button>'
+      }
+    }
+    document.getElementById("select_edges").innerHTML = edges_display;
+  }
+}
+
+/* delete now selecting node */
+function DeleteNode(){
+  var index = selectingNode.index;
+  if(selectingNode == null){
+    return false;
+  }
+
+  if(window.confirm('Delete selected node and including edge(s)?\nID: ' + String(index))){
+    // delete edge using target node at first
+    for(var i = edge_list.length - 1; i >= 0; i--){
+      var target_edge = edge_list[i];
+      if(target_edge.node_1.index == index || target_edge.node_2.index == index){
+        target_edge.polyLine.setMap(null);
+        edge_list.splice(i, 1);
+      }
+    }
+
+    // then delete target node and update index
+    selectingNode.marker.setMap(null);
+    node_list.splice(index, 1);
+
+    for(var i = index; i < node_list.length; i++){
+      var selectIndex = i;
+      node_list[i].index = selectIndex;
+      google.maps.event.clearInstanceListeners(node_list[i].marker);
+      google.maps.event.addListener(node_list[i].marker, 'click', function(e) {
+        SelectNode(selectIndex);
+      })
+      google.maps.event.addListener(node_list[i].marker, 'dragend', function(e) {
+        MoveNode(selectIndex, e.latLng);
+      })
+    }
+
+    selectingNode = null;
+    SelectDisplay();
+  }
+}
+
+function DeleteEdge(index){
+  var target_edge = edge_list[index];
+  if(window.confirm('Delete selected edge?\nID: ' + String(target_edge.node_1.index) + '-' + String(target_edge.node_2.index) )){
+    target_edge.polyLine.setMap(null);
+    edge_list.splice(index, 1);
+    SelectDisplay();
+  }
+}
