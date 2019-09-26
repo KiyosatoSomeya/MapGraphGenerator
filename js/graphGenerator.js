@@ -3,8 +3,10 @@ var elevationObj;
 var node_list = new Array();
 var edge_list = new Array();
 var selectingNode;
+var autoChangeElevation = false;
+var autoChangeDistance = false;
 
-class map_node{
+class Map_node{
   constructor(index, latitude, longitude, value, info, marker){
     this.index = index;
     this.latitude = latitude;
@@ -15,25 +17,38 @@ class map_node{
   }
 }
 
-class map_edge{
-  constructor(node_1_id, node_2_id, value, info){
+class Map_edge{
+  constructor(node_1_id, node_2_id, value, info, polyLine){
     this.node_1_id = node_1_id;
     this.node_2_id = node_2_id;
     this.value = value;
     this.info = info;
+    this.polyLine = polyLine;
   }
 }
 
 /* center position is Tokyo Institute of Technology */
-function initMap() {
+function InitMap() {
     var target = document.getElementById('map');
 
     map = new google.maps.Map(target, {
     center: {lat: 35.605232, lng: 139.683530},
-    zoom: 14
+    zoom: 16
     });
 
     elevationObj = new google.maps.ElevationService();
+}
+
+function ChangeAutoElevation(){
+  if(document.getElementById("autoElevation").checked){
+    autoChangeElevation = true;
+  }
+}
+
+function ChangeAutoDistance(){
+if(document.getElementById("autoDistance").checked){
+    autoChangeDistance = true;
+  }
 }
 
 function SetLatLng(){
@@ -69,14 +84,15 @@ function AddNode(){
     map: map
   });
 
-  selectingNode = new map_node(node_list.length, lat, lng, value, info, newMarker);
+  selectingNode = new Map_node(node_list.length, lat, lng, value, info, newMarker);
   node_list.push(selectingNode);
 
+  var index = selectingNode.index;
   google.maps.event.addListener(newMarker, 'click', function(e) {
-    SelectNode(selectingNode.index);
+    SelectNode(index);
   })
   google.maps.event.addListener(newMarker, 'dragend', function(e) {
-    SelectNode(selectingNode.index, e.latLng);
+    MoveNode(index, e.latLng);
   })
 
   // reset input field
@@ -100,9 +116,9 @@ function SetDistance(){
   var id_2 = parseInt(document.getElementById("node2Input").value);
   var node_1 = node_list[id_1];
   var node_2 = node_list[id_2];
-  var lat_d = node_1.latitude - node_2.latitude;
-  var lng_d = node_1.longitude - node_2.longitude;
-  var distance = Math.sqrt(lat_d * lat_d + lng_d * lng_d);
+  var position_1 = new google.maps.LatLng(node_1.latitude, node_1.longitude);
+  var position_2 = new google.maps.LatLng(node_2.latitude, node_2.longitude);
+  var distance = google.maps.geometry.spherical.computeDistanceBetween(position_1, position_2);
   document.getElementById("distanceInput").value = String(distance);
 }
 
@@ -111,35 +127,77 @@ function AddEdge(){
   var id_2 = parseInt(document.getElementById("node2Input").value);
   var value = parseFloat(document.getElementById("distanceInput").value);
   var info = document.getElementById("edgeInfoInput").value;
-  var newEdge = new map_edge(id_1, id_2, value, info);
-  edge_list.push(newEdge);
 
   // show in the google map
   var node_1 = node_list[id_1];
   var node_2 = node_list[id_2];
-
   var path = new Array();
-  path.push(new google.maps.latLng(node_1.latitude, node_1.longitude));
-  path.push(new google.maps.latLng(node_2.latitude, node_2.longitude));
+  path.push(new google.maps.LatLng(node_1.latitude, node_1.longitude));
+  path.push(new google.maps.LatLng(node_2.latitude, node_2.longitude));
   var polyLineOptions = {
       path: path,
-      strokeWeight: 2,
+      strokeWeight: 6,
       strokeColor: "#636262",
       strokeOpacity: "0.8"
   };
   var polyLine = new google.maps.Polyline(polyLineOptions);
   polyLine.setMap(map);
 
+  var newEdge = new Map_edge(id_1, id_2, value, info, polyLine);
+  edge_list.push(newEdge);
 }
 
 /* This function is called when a marker on the google map is clicked. */
 function SelectNode(index){
   selectingNode = node_list[index];
-  alert(String(index) + String(selectingNode.latitude) + string(selectingNode.longitude));
 }
 
 /* This function is called when a marker on the google map is dragend. */
 function MoveNode(index, newLatLng){
-  node_list[index].latitude = newLatLng.lat();
-  node_list[index].longitude = newLatLng.lng();
+  selectingNode = node_list[index];
+  selectingNode.latitude = newLatLng.lat();
+  selectingNode.longitude = newLatLng.lng();
+
+  if(autoChangeElevation){
+    var latlng = new google.maps.LatLng(selectingNode.latitude, selectingNode.longitude);
+    var request = {locations: new Array(latlng)};
+    elevationObj.getElevationForLocations(request, function(response, status){
+      if(status == google.maps.ElevationStatus.OK){
+        selectingNode.value = response[0].elevation;
+      }else{
+        alert("Could not get elevation");
+      }
+    })
+  }
+
+  // move poly line
+  for(var target_edge of edge_list){
+    if(target_edge.node_1_id == index || target_edge.node_2_id == index){
+      target_edge.polyLine.setMap(null);
+
+      var node_1 = node_list[target_edge.node_1_id];
+      var node_2 = node_list[target_edge.node_2_id];
+      var path = new Array();
+      path.push(new google.maps.LatLng(node_1.latitude, node_1.longitude));
+      path.push(new google.maps.LatLng(node_2.latitude, node_2.longitude));
+      var polyLineOptions = {
+          path: path,
+          strokeWeight: 6,
+          strokeColor: "#636262",
+          strokeOpacity: "0.8"
+      };
+      var polyLine = new google.maps.Polyline(polyLineOptions);
+      polyLine.setMap(map);
+      target_edge.polyLine = polyLine;
+
+      if(autoChangeDistance){
+        var position_1 = new google.maps.LatLng(node_1.latitude, node_1.longitude);
+        var position_2 = new google.maps.LatLng(node_2.latitude, node_2.longitude);
+        var distance = google.maps.geometry.spherical.computeDistanceBetween(position_1, position_2);
+        target_edge.value = String(distance);
+      }
+    }
+  }
 }
+
+

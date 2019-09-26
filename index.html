@@ -14,7 +14,12 @@
   <h1>Map Graph Generator</h1>
   <div id="block_left">
     <div id="map"></div><!-- 地図を表示する div 要素（id="map"）-->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9ylnYVRGJ6iUVkMDf75ZkOBfdW5JgqsA&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9ylnYVRGJ6iUVkMDf75ZkOBfdW5JgqsA&callback=InitMap" async defer></script>
+    
+    <div class="under_map">
+      <input id="autoElevation" type="checkbox" name="autoMap" value="1" onchange="ChangeAutoElevation()"> Automatically change node values according to elevation<br>
+      <input id="autoDistance" type="checkbox" name="autoMap" value="2" onchange="ChangeAutoDistance()"> Automatically change edge values according to distance<br>
+    </div>
 
     <div id="new_panel_area">
 
@@ -24,19 +29,31 @@
       <label class="new_panel_tab" for="edge_tab">Edge</label>
 
       <div class="new_panel" id="node_content">
-        <div id="new_panel_left">
-          Latitude<br>
-          Longitude<br>
-          Value<br>
-          Info.<br>
+        <div class="new_panel_left">
+          Latitude
         </div>
-        <div id="new_panel_right">
-          <input type="text" id="latInput" name="Latitude" class="short"><br>
+        <div class="new_panel_right">
+          <input type="text" id="latInput" name="Latitude" class="short">
+        </div>
+        <div class="new_panel_left">
+          Longitude
+        </div>
+        <div class="new_panel_right">
           <input type="text" id="lngInput" name="Longitude" class="short">
-          <button type="button" name="autoInputlatlngBtn" class="new_panel_input_button" onclick="SetLatLng()">Input center of the map</button><br>
+          <button type="button" name="autoInputlatlngBtn" class="new_panel_input_button" onclick="SetLatLng()">Input center of the map</button>
+        </div>
+        <div class="new_panel_left">
+          Value
+        </div>
+        <div class="new_panel_right">
           <input type="text" id="elevInput" name="Elevation" class="short">
-          <button type="button" name="autoInputElevBtn" class="new_panel_input_button" onclick="SetElev()">Input elevation</button><br>
-          <input type="text" id="nodeInfoInput" name="Info" class="long"><br>
+          <button type="button" name="autoInputElevBtn" class="new_panel_input_button" onclick="SetElev()">Input elevation</button>
+        </div>
+        <div class="new_panel_left">
+          Info.
+        </div>
+        <div class="new_panel_right">
+          <input type="text" id="nodeInfoInput" name="Info" class="short">
         </div>
         <div id="button_wrapper">
           <button type="button" name="createNodeBtn" class="new_panel_create_button" onclick="AddNode()">
@@ -46,27 +63,43 @@
       </div>
 
       <div class="new_panel" id="edge_content">
-        <div id="new_panel_left">
-          Node 1<br>
-          Node 2<br>
-          Value<br>
-          Info.<br>
+        <div class="new_panel_left">
+          Node 1
         </div>
-        <div id="new_panel_right">
+        <div class="new_panel_right">
           <input type="text" id="node1Input" name="Node1" class="short">
-          <button type="button" name="autoInputNode1Btn" class="new_panel_input_button" onclick="SetNode1()">Input selecting node</button><br>
+          <button type="button" name="autoInputNode1Btn" class="new_panel_input_button" onclick="SetNode1()">Input selecting node</button>
+        </div>
+        <div class="new_panel_left">
+          Node 2
+        </div>
+        <div class="new_panel_right">
           <input type="text" id="node2Input" name="Node2" class="short">
-          <button type="button" name="autoInputNode2Btn" class="new_panel_input_button" onclick="SetNode2()">Input selecting node</button><br>
+          <button type="button" name="autoInputNode2Btn" class="new_panel_input_button" onclick="SetNode2()">Input selecting node</button>
+        </div>
+        <div class="new_panel_left">
+          Value
+        </div>
+        <div class="new_panel_right">
           <input type="text" id="distanceInput" name="Node2" class="short">
-          <button type="button" name="autoInputDistanceBtn" class="new_panel_input_button" onclick="SetDistance()">Input distance</button><br>
-          <input type="text" id="edgeInfoInput" name="Info" class="long"><br>
+          <button type="button" name="autoInputDistanceBtn" class="new_panel_input_button" onclick="SetDistance()">Input distance</button>
+        </div>
+        <div class="new_panel_left">
+          Info.
+        </div>
+        <div class="new_panel_right">
+          <input type="text" id="edgeInfoInput" name="Info" class="short"><br>
         </div>
         <div id="button_wrapper">
-          <button type="button" name="createEdgeBtn" class="new_panel_create_button">
+          <button type="button" name="createEdgeBtn" class="new_panel_create_button" onclick="AddEdge()">
             Create New Edge
           </button>
         </div>
       </div>
+    </div>
+
+    <div class="normal_panel">
+      Export Option
     </div>
   </div>
 
