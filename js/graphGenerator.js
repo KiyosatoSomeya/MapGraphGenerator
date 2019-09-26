@@ -9,6 +9,10 @@ var marker_icon;
 var marker_icon_info;
 var selected_marker_icon;
 var selected_marker_icon_info;
+var includeNodeValue = true;
+var includeNodeInfo = true;
+var includeEdgeValue = true;
+var includeEdgeInfo = true;
 
 class Map_node{
   constructor(index, latitude, longitude, value, info, marker){
@@ -72,6 +76,30 @@ if(document.getElementById("autoDistance").checked){
   }
 }
 
+function ChangeIncludeNodeValue(){
+  if(document.getElementById("includeValueCheck").checked){
+    includeNodeValue = true;
+  }
+}
+
+function ChangeIncludeNodeInfo(){
+if(document.getElementById("includeInfoCheck").checked){
+    includeNodeInfo = true;
+  }
+}
+
+function ChangeIncludeEdgeValue(){
+  if(document.getElementById("includeValueCheck").checked){
+    includeEdgeValue = true;
+  }
+}
+
+function ChangeIncludeEdgeInfo(){
+if(document.getElementById("includeInfoCheck").checked){
+    includeEdgeInfo = true;
+  }
+}
+
 function SetLatLng(){
   var latlng = map.getCenter();
   document.getElementById("latInput").value = String(latlng.lat());
@@ -99,7 +127,16 @@ function AddNode(){
   var value = parseFloat(document.getElementById("elevInput").value);
   var info = document.getElementById("nodeInfoInput").value;
 
-  var newMarker = new google.maps.Marker({  // set marker to the google map
+  if(isNaN(lat) || isNaN(lng)){
+    alert("Error: Incorrect latitude or longitude is detected.");
+    return;
+  }
+
+  if(isNaN(value)){
+    value = 0;
+  }
+
+  var newMarker = new google.maps.Marker({  // set marker to the google maps
     position: new google.maps.LatLng(lat, lng),
     animation: google.maps.Animation.DROP,
     icon: selected_marker_icon,
@@ -172,12 +209,21 @@ function AddEdge(){
   var value = parseFloat(document.getElementById("distanceInput").value);
   var info = document.getElementById("edgeInfoInput").value;
 
-  if(id_1 >= node_list.length || id_2 >= node_list.length){
-    alert("Error: ID is out of range.");
+  if(isNaN(id_1) || isNaN(id_2)){
+    alert("Error: Incorrect node ID is detected.");
     return;
   }
 
-  // show in the google map
+  if(isNaN(value)){
+    value = 0;
+  }
+
+  if(id_1 >= node_list.length || id_1 < 0 || id_2 >= node_list.length || id_2 < 0){
+    alert("Error: Inputted node ID is not exist.");
+    return;
+  }
+
+  // show in the google maps
   var node_1 = node_list[id_1];
   var node_2 = node_list[id_2];
   var path = new Array();
@@ -195,10 +241,15 @@ function AddEdge(){
   var newEdge = new Map_edge(node_1, node_2, value, info, polyLine);
   edge_list.push(newEdge);
 
+  // reset input field
+  document.getElementById("node1Input").value = "";
+  document.getElementById("node2Input").value = "";
+  document.getElementById("distanceInput").value = "";
+  document.getElementById("edgeInfoInput").value = "";
   SelectDisplay();
 }
 
-/* This function is called when a marker on the google map is clicked. */
+/* This function is called when a marker on the google maps is clicked. */
 function SelectNode(index){
   SwitchSelectingNode(node_list[index]);
   if(selectingNode.info != ""){
@@ -209,7 +260,7 @@ function SelectNode(index){
   SelectDisplay();
 }
 
-/* This function is called when a marker on the google map is dragend. */
+/* This function is called when a marker on the google maps is dragend. */
 function MoveNode(index, newLatLng){
   SwitchSelectingNode(node_list[index]);
   selectingNode.latitude = newLatLng.lat();
@@ -311,7 +362,7 @@ function SelectDisplay(){
 function DeleteNode(){
   var index = selectingNode.index;
   if(selectingNode == null){
-    return false;
+    return;
   }
 
   if(window.confirm('Delete selected node and including edge(s)?\nID: ' + String(index))){
@@ -352,4 +403,86 @@ function DeleteEdge(index){
     edge_list.splice(index, 1);
     SelectDisplay();
   }
+}
+
+function DeleteAllNodes(){
+  if(window.confirm('Delete all nodes and edges?')){
+    selectingNode = null;
+
+    // remove all markers from google maps
+    for(var target_node of node_list){
+      target_node.marker.setMap(null);
+    }
+    node_list.length = 0; // remove all node object
+
+    // remove all edges from google maps
+    for(var target_edge of edge_list){
+      target_edge.polyLine.setMap(null);
+    }
+    edge_list.length = 0; // remove all edge object
+    SelectDisplay();
+  }
+}
+
+function ExportFile(){
+  var result = "latitude,longitude";
+  if(includeNodeValue){
+    result += ",value";
+  }
+  if(includeNodeInfo){
+    result += ",info";
+  }
+
+  for(var target_node of node_list){
+    result += "\n" +
+    String(target_node.latitude) + "," +
+    String(target_node.longitude);
+
+    if(includeNodeValue){
+      result += "," + String(target_node.value);
+    }
+    if(includeNodeInfo){
+      result += "," + target_node.info;
+    }
+  }
+
+  result += "\nid_1,id_2";
+  if(includeEdgeValue){
+    result += ",value";
+  }
+  if(includeEdgeInfo){
+    result += ",info";
+  }
+
+  for(var target_edge of edge_list){
+    result += "\n" +
+    String(target_edge.node_1.index) + "," +
+    String(target_edge.node_2.index);
+
+    if(includeEdgeValue){
+      result += "," + String(target_edge.value);
+    }
+    if(includeEdgeInfo){
+      result += "," + String(target_edge.info);
+    }
+  }
+
+  var blob = new Blob([result], {type: "text/plain"});
+
+  // create and download file
+  if(window.navigator.msSaveBlob){
+    // IE
+    window.navigator.msSaveBlob(blob, "graph.csv");
+  }else{
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.target = "_blank";
+    link.download = "graph.csv";
+    link.click();
+    URL.revokeObjectURL();
+  }
+}
+
+function ImportFile(){
+
 }

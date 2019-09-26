@@ -14,7 +14,7 @@ h1 {
 
 h2 {
   margin: 0;
-  padding: 0;
+  padding: 0 0 10px 0;
   color: #222222;
   font-size: 30px;
 }
@@ -54,7 +54,7 @@ div.under_map{
   max-width: 400px;
 }
 
-#button_wrapper{
+div.button_wrapper{
   clear: both;
   text-align: center;
 }
@@ -263,6 +263,59 @@ button.select_panel_delete_button{
   text-align: center;
 }
 
-button.select_panel_delete_button:active{
+button.select_panel_delete_button:active,
+button.all_delete_button:active{
   background-color: #4F3338;
+}
+
+div.exportOptions{
+  float: left;
+  min-height: 20px;
+  width: 50%;
+  min-width: 180px;
+  margin: 0 0 10px 0;
+}
+
+button.import_file_button{
+  background: none;
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  font-family: 'Marvel', sans-serif;
+
+  height: 40px;
+  width: 80%;
+  max-width: 300px;
+  min-width: 180px;
+  margin: 0;
+  background-color: #636262;
+  border-radius: 10px;
+  color: #F2F2F2;
+  font-size: 25px;
+  text-align: center;
+}
+
+button.all_delete_button{
+  background: none;
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  font-family: 'Marvel', sans-serif;
+
+  height: 40px;
+  width: 80%;
+  max-width: 300px;
+  min-width: 180px;
+  margin: 10px 0 0 0;
+  background-color: #684348;
+  border-radius: 10px;
+  color: #F2F2F2;
+  font-size: 25px;
+  text-align: center;
 }

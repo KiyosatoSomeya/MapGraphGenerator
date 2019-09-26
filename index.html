@@ -56,7 +56,7 @@
           <div class="new_panel_right">
             <input type="text" id="nodeInfoInput" name="Info" class="short">
           </div>
-          <div id="button_wrapper">
+          <div class="button_wrapper">
             <button type="button" name="createNodeBtn" class="new_panel_create_button" onclick="AddNode()">
               Create New Node
             </button>
@@ -91,7 +91,7 @@
           <div class="new_panel_right">
             <input type="text" id="edgeInfoInput" name="Info" class="short">
           </div>
-          <div id="button_wrapper">
+          <div class="button_wrapper">
             <button type="button" name="createEdgeBtn" class="new_panel_create_button" onclick="AddEdge()">
               Create New Edge
             </button>
@@ -101,11 +101,41 @@
 
       <div class="export_panel">
         <h2>Export Option</h2>
-        <div id="button_wrapper">
-            <button type="button" name="exportBtn" class="new_panel_create_button" onclick="">
-               Export File
-            </button>
-          </div>
+        <div class="exportOptions">
+          <input id="includeNodeValueCheck" type="checkbox" name="autoMap" value="1" onchange="ChangeIncludeNodeValue()" checked>
+          Include value of node<br>
+        </div>
+        <div class="exportOptions">
+          <input id="includeNodeInfoCheck" type="checkbox" name="autoMap" value="2" onchange="ChangeIncludeNodeInfo()" checked>
+          Include Info. of node<br>
+        </div>
+        <div class="exportOptions">
+          <input id="includeEdgeValueCheck" type="checkbox" name="autoMap" value="1" onchange="ChangeIncludeEdgeValue()" checked>
+          Include value of edge<br>
+        </div>
+        <div class="exportOptions">
+          <input id="includeEdgeInfoCheck" type="checkbox" name="autoMap" value="2" onchange="ChangeIncludeEdgeInfo()" checked>
+          Include Info. of edge<br>
+        </div>
+        <div class="button_wrapper">
+          <button type="button" name="exportBtn" class="new_panel_create_button" onclick="ExportFile()">
+             Export File
+          </button>
+        </div>
+      </div>
+
+      <div class="export_panel">
+        <h2>Edit Node</h2>
+        <div class="button_wrapper">
+          <button type="button" name="importBtn" class="import_file_button" onclick="ImportFile()">
+             Import File
+          </button>
+        </div>
+        <div class="button_wrapper">
+          <button type="button" name="deleteAllBtn" class="all_delete_button" onclick="DeleteAllNodes()">
+             Delete all nodes
+          </button>
+        </div>
       </div>
     </div>
 
