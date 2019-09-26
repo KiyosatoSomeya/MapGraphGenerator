@@ -1,12 +1,16 @@
 var map;
 var elevationObj;
+var node_list = []
+var edge_list = []
+var selectingNode;
 
 class map_node{
-  constructor(latitude, longitude, elevation, info){
+  constructor(latitude, longitude, elevation, info, marker){
     this.latitude = latitude;
     this.longitude = longitude;
     this.elevation = elevation;
     this.info = info;
+    this.marker = marker;
   }
 }
 
@@ -46,3 +50,33 @@ function SetLatLngElev(){
   })
 }
 
+function AddNode(){
+  var lat = Float.parseFloat(document.getElementById("latInput").value);
+  var lng = Float.parseFloat(document.getElementById("lngInput").value);
+  var elev = Float.parseFloat(document.getElementById("elevInput").value);
+  var info = document.getElementById("infoInput").value;
+  var newMarker = new google.maps.Marker({
+    position: new google.maps.LatLng(lat, lng),
+    map: map
+  });
+
+  node_list.push(new map_node(lat, lng, elev, info, newMarker));
+
+  google.maps.event.addListener(markers, 'click', function(e) {
+    SelectNode(node_list.length - 1);
+  })
+
+  // reset input field
+  document.getElementById("latInput").value = "";
+  document.getElementById("lngInput").value = "";
+  document.getElementById("elevInput").value = "";
+}
+
+function AddEdge(){
+
+}
+
+function SelectNode(index){
+  selectingNode = node_list[index];
+  alert(String(index) + String(selectingNode.latitude) + string(selectingNode.longitude));
+}
