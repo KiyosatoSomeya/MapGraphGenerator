@@ -97,7 +97,7 @@ div.new_panel{
   float: left;
 }
 
-#new_panel_input_button{
+button.new_panel_input_button{
   background: none;
   border: none;
   outline: none;
@@ -115,7 +115,7 @@ div.new_panel{
   font-size: 20px;
 }
 
-#new_panel_create_button{
+button.new_panel_create_button{
   background: none;
   border: none;
   outline: none;
@@ -135,6 +135,14 @@ div.new_panel{
   text-align: center;
 }
 
+button.new_panel_input_button:active{
+  background-color: #C1533C;
+}
+
+button.new_panel_create_button:active{
+  background-color: #C1533C;
+}
+
 input.short{
   background-color: #F2F2F2;
   width: 150px;
@@ -150,12 +158,3 @@ input.long{
 input[name=new_panel_tab]{
   display: none;
 }
-
-#new_panel_input_button:active{
-  background-color: #C1533C;
-}
-
-#new_panel_create_button:active{
-  background-color: #C1533C;
-}
-

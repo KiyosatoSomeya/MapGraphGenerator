@@ -27,18 +27,19 @@
         <div id="new_panel_left">
           Latitude<br>
           Longitude<br>
-          Elevation<br>
+          Value<br>
           Info.<br>
         </div>
         <div id="new_panel_right">
           <input type="text" id="latInput" name="Latitude" class="short"><br>
-          <input type="text" id="lngInput" name="Longitude" class="short"><br>
+          <input type="text" id="lngInput" name="Longitude" class="short">
+          <button type="button" name="autoInputlatlngBtn" class="new_panel_input_button" onclick="SetLatLng()">Input center of the map</button><br>
           <input type="text" id="elevInput" name="Elevation" class="short">
-          <button type="button" name="autoInputBtn" id="new_panel_input_button" onclick="SetLatLngElev()">Input center of the map</button><br>
+          <button type="button" name="autoInputBtn" class="new_panel_input_button" onclick="SetElev()">Input elevation</button><br>
           <input type="text" id="infoInput" name="Info" class="long"><br>
         </div>
         <div id="button_wrapper">
-          <button type="button" name="createNodeBtn" id="new_panel_create_button" onclick="AddNode()">
+          <button type="button" name="createNodeBtn" class="new_panel_create_button" onclick="AddNode()">
             Create New Node
           </button>
         </div>
@@ -51,14 +52,14 @@
           Info.<br>
         </div>
         <div id="new_panel_right">
-          <input type="text" name="Node1" class="short">
-          <button type="button" name="autoInputBtn1" id="new_panel_input_button">Input selecting node</button><br>
-          <input type="text" name="Node2" class="short">
-          <button type="button" name="autoInputBtn2" id="new_panel_input_button">Input selecting node</button><br>
+          <input type="text" id="node1Input" name="Node1" class="short">
+          <button type="button" name="autoInputBtn1" class="new_panel_input_button">Input selecting node</button><br>
+          <input type="text" id="node2Input" name="Node2" class="short">
+          <button type="button" name="autoInputBtn2" class="new_panel_input_button">Input selecting node</button><br>
           <input type="text" name="Info" class="long"><br>
         </div>
         <div id="button_wrapper">
-          <button type="button" name="createEdgeBtn" id="new_panel_create_button">
+          <button type="button" name="createEdgeBtn" class="new_panel_create_button">
             Create New Edge
           </button>
         </div>

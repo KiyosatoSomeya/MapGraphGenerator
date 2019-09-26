@@ -5,7 +5,8 @@ var edge_list = []
 var selectingNode;
 
 class map_node{
-  constructor(latitude, longitude, elevation, info, marker){
+  constructor(index, latitude, longitude, elevation, info, marker){
+    this.index = index;
     this.latitude = latitude;
     this.longitude = longitude;
     this.elevation = elevation;
@@ -33,18 +34,21 @@ function initMap() {
     elevationObj = new google.maps.ElevationService();
 }
 
-function SetLatLngElev(){
+function SetLatLng(){
   var latlng = map.getCenter();
+  document.getElementById("latInput").value = String(latlng.lat());
+  document.getElementById("lngInput").value = String(latlng.lng());
+}
 
-  var request = {locations: new Array(latlng)}
+function SetElev(){
+  var lat = Float.parseFloat(document.getElementById("latInput").value);
+  var lng = Float.parseFloat(document.getElementById("lngInput").value);
+  var latlng = new google.maps.LatLng(lat, lng);
+  var request = {locations: new Array(latlng)};
   elevationObj.getElevationForLocations(request, function(response, status){
     if(status == google.maps.ElevationStatus.OK){
-      document.getElementById("latInput").value = String(latlng.lat());
-      document.getElementById("lngInput").value = String(latlng.lng());
       document.getElementById("elevInput").value = String(response[0].elevation);
     }else{
-      document.getElementById("latInput").value = String(latlng.lat());
-      document.getElementById("lngInput").value = String(latlng.lng());
       alert("Could not get elevation");
     }
   })
@@ -60,10 +64,11 @@ function AddNode(){
     map: map
   });
 
-  node_list.push(new map_node(lat, lng, elev, info, newMarker));
+  selectingNode = new map_node(node_list.length, lat, lng, elev, info, newMarker);
+  node_list.push(selectingNode);
 
   google.maps.event.addListener(markers, 'click', function(e) {
-    SelectNode(node_list.length - 1);
+    SelectNode(selectingNode.index);
   })
 
   // reset input field
@@ -71,6 +76,16 @@ function AddNode(){
   document.getElementById("lngInput").value = "";
   document.getElementById("elevInput").value = "";
 }
+
+function SetNode1(){
+  document.getElementById("node1Input").value = String(selectingNode.index);
+}
+
+function SetNode2(){
+  document.getElementById("node2Input").value = String(selectingNode.index);
+}
+
+function 
 
 function AddEdge(){
 
