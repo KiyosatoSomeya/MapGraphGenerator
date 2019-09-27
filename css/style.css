@@ -180,7 +180,7 @@ input.short{
   font-size: 18px;
 }
 
-input[name=new_panel_tab]{
+input.hidden{
   display: none;
 }
 
@@ -201,6 +201,7 @@ div.select_panel{
   border-radius: 10px;
   background-color: #F2F2F2;
   font-size: 20px;
+  line-height: 30px;
   color: #222222;
 }
 
@@ -229,10 +230,10 @@ div.select_panel_left{
 div.select_panel_right{
   height: auto;
   width: 60%;
-  min-width: 150px;
   float: right;
   text-align: right;
   overflow-wrap : break-word;
+  padding: 0 5px 0 0;
 }
 
 div.select_panel_both{
@@ -240,6 +241,17 @@ div.select_panel_both{
   height: auto;
   width: 100%;
   overflow-wrap : break-word;
+  padding: 0 5px 0 0;
+}
+
+input.select_panel_right{
+  width: 100%;
+  text-align: right;
+}
+
+textarea.select_panel_both{
+  height: auto;
+  width: 100%;
 }
 
 button.select_panel_delete_button{
@@ -263,6 +275,27 @@ button.select_panel_delete_button{
   text-align: center;
 }
 
+button.select_panel_update_button{
+  background: none;
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  font-family: 'Marvel', sans-serif;
+
+  height: 25px;
+  width: 100%;
+  min-width: 90px;
+  margin: 10px 0 0 0;
+  background-color: #636262;
+  border-radius: 10px;
+  color: #F2F2F2;
+  font-size: 16px;
+  text-align: center;
+}
+
 button.select_panel_delete_button:active,
 button.all_delete_button:active{
   background-color: #4F3338;
@@ -276,26 +309,25 @@ div.exportOptions{
   margin: 0 0 10px 0;
 }
 
-button.import_file_button{
-  background: none;
-  border: none;
-  outline: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+label.import_file_button{
   cursor: pointer;
-  font-family: 'Marvel', sans-serif;
-
+  display: block;
   height: 40px;
+  line-height: 40px;
   width: 80%;
   max-width: 300px;
   min-width: 180px;
-  margin: 0;
+  margin: 0 auto;
   background-color: #636262;
   border-radius: 10px;
   color: #F2F2F2;
   font-size: 25px;
   text-align: center;
+}
+
+button.select_panel_update_button:active,
+label.import_file_button:active{
+  background-color: #545455;
 }
 
 button.all_delete_button{

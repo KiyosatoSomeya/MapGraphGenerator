@@ -118,14 +118,14 @@ function SetElev(){
     }else{
       alert("Could not get elevation");
     }
-  })
+  });
 }
 
 function AddNode(){
   var lat = parseFloat(document.getElementById("latInput").value);
   var lng = parseFloat(document.getElementById("lngInput").value);
   var value = parseFloat(document.getElementById("elevInput").value);
-  var info = document.getElementById("nodeInfoInput").value;
+  var info = String(document.getElementById("nodeInfoInput").value);
 
   if(isNaN(lat) || isNaN(lng)){
     alert("Error: Incorrect latitude or longitude is detected.");
@@ -150,10 +150,10 @@ function AddNode(){
   var index = selectingNode.index;
   google.maps.event.addListener(newMarker, 'click', function(e) {
     SelectNode(index);
-  })
+  });
   google.maps.event.addListener(newMarker, 'dragend', function(e) {
     MoveNode(index, e.latLng);
-  })
+  });
 
   // reset input field
   document.getElementById("latInput").value = "";
@@ -167,7 +167,7 @@ function AddNode(){
 function SwitchSelectingNode(newSelectingNode){
   // unselect now selecting marker
   if(selectingNode != null){
-    if(selectingNode.info == ""){
+    if(selectingNode.info === ""){
       selectingNode.marker.setIcon(marker_icon);
     }else{
       selectingNode.marker.setIcon(marker_icon_info);
@@ -176,7 +176,7 @@ function SwitchSelectingNode(newSelectingNode){
 
   selectingNode = newSelectingNode;
 
-  if(selectingNode.info == ""){
+  if(selectingNode.info === ""){
     selectingNode.marker.setIcon(selected_marker_icon);
   }else{
     selectingNode.marker.setIcon(selected_marker_icon_info);
@@ -290,7 +290,7 @@ function MoveNode(index, newLatLng){
         var position_1 = new google.maps.LatLng(node_1.latitude, node_1.longitude);
         var position_2 = new google.maps.LatLng(node_2.latitude, node_2.longitude);
         var distance = google.maps.geometry.spherical.computeDistanceBetween(position_1, position_2);
-        target_edge.value = String(distance);
+        target_edge.value = distance;
       }
     }
   }
@@ -308,7 +308,7 @@ function MoveNode(index, newLatLng){
         SelectDisplay();
         alert("Could not get elevation");
       }
-    })
+    });
   }else{
     SelectDisplay();
   }
@@ -316,20 +316,20 @@ function MoveNode(index, newLatLng){
 
 function SelectDisplay(){
   if(selectingNode == null){
-    document.getElementById("select_id").textContent = "-";
-    document.getElementById("select_lat").textContent = "-";
-    document.getElementById("select_lng").textContent = "-";
-    document.getElementById("select_val").textContent = "-";
-    document.getElementById("select_info").textContent = "-";
+    document.getElementById("select_id").textContent = "";
+    document.getElementById("select_lat").value = "";
+    document.getElementById("select_lng").value = "";
+    document.getElementById("select_val").value = "";
+    document.getElementById("select_info").value = "";
 
     document.getElementById("select_edges").innerHTML = "";
   }else{
     var index = selectingNode.index;
     document.getElementById("select_id").textContent = String(index);
-    document.getElementById("select_lat").textContent = String(selectingNode.latitude);
-    document.getElementById("select_lng").textContent = String(selectingNode.longitude);
-    document.getElementById("select_val").textContent = String(selectingNode.value);
-    document.getElementById("select_info").textContent = String(selectingNode.info);
+    document.getElementById("select_lat").value = String(selectingNode.latitude);
+    document.getElementById("select_lng").value = String(selectingNode.longitude);
+    document.getElementById("select_val").value = String(selectingNode.value);
+    document.getElementById("select_info").value = String(selectingNode.info);
     var edges_display = "";
     var edge_count = 0;
 
@@ -344,18 +344,100 @@ function SelectDisplay(){
         }
 
         edges_display += '<div class="select_panel_left">ID:</div><div class="select_panel_right">'+
-        String(target_edge.node_1.index) + '-'+ String(target_edge.node_2.index) +
-        '</div><div class="select_panel_left">Value:</div><div class="select_panel_right">'+
+        String(target_edge.node_1.index)+'-'+String(target_edge.node_2.index)+
+        '</div><div class="select_panel_left">Value:</div><div class="select_panel_right"><input type="text" id="select_val_'+String(i)+'" class="select_panel_right" value="'+
         String(target_edge.value)+
-        '</div><div class="select_panel_left">Info:</div><div class="select_panel_both">'+
+        '"></div><div class="select_panel_left">Info:</div><div class="select_panel_both"><textarea id="select_info_'+String(i)+'" class="select_panel_both" value="">'+
         target_edge.info+
-        '</div><button type="button" name="deleteEdgeBtn" class="select_panel_delete_button" onclick="DeleteEdge('+
-        String(i)+
-        ')">Delete Edge</button>'
+        '</textarea></div>'+
+        '<button type="button" name="deleteEdgeBtn" class="select_panel_update_button" onclick="UpdateEdge('+String(i)+')">Update Edge</button>'+
+        '<button type="button" name="deleteEdgeBtn" class="select_panel_delete_button" onclick="DeleteEdge('+String(i)+')">Delete Edge</button>'
       }
     }
     document.getElementById("select_edges").innerHTML = edges_display;
   }
+}
+
+/* Update now selecting node */
+function UpdateNode(){
+  if(selectingNode == null){
+    return;
+  }
+
+  var lat = parseFloat(document.getElementById("select_lat").value);
+  var lng = parseFloat(document.getElementById("select_lng").value);
+  var value = parseFloat(document.getElementById("select_val").value);
+  var info = String(document.getElementById("select_info").value);
+
+  if(isNaN(lat) || isNaN(lng)){
+    alert("Error: Incorrect latitude or longitude is detected.");
+    SelectDisplay();
+    return;
+  }
+
+  if(isNaN(value)){
+    value = 0;
+  }
+
+  selectingNode.latitude = lat;
+  selectingNode.longitude = lng;
+  selectingNode.value = value;
+  selectingNode.info = info;
+
+  selectingNode.marker.setPosition(new google.maps.LatLng(lat, lng));
+
+  // change icon
+  if(info===""){
+    selectingNode.marker.setIcon(selected_marker_icon);
+  }else{
+    selectingNode.marker.setIcon(selected_marker_icon_info);    
+  }
+
+  // move poly line
+  var index = selectingNode.index;
+
+  for(var target_edge of edge_list){
+    if(target_edge.node_1.index == index || target_edge.node_2.index == index){
+      target_edge.polyLine.setMap(null);
+
+      var node_1 = target_edge.node_1
+      var node_2 = target_edge.node_2;
+      var path = new Array();
+      path.push(new google.maps.LatLng(node_1.latitude, node_1.longitude));
+      path.push(new google.maps.LatLng(node_2.latitude, node_2.longitude));
+      var polyLineOptions = {
+          path: path,
+          strokeWeight: 6,
+          strokeColor: "#636262",
+          strokeOpacity: "0.8"
+      };
+      var polyLine = new google.maps.Polyline(polyLineOptions);
+      polyLine.setMap(map);
+      target_edge.polyLine = polyLine;
+
+      if(autoChangeDistance){
+        var position_1 = new google.maps.LatLng(node_1.latitude, node_1.longitude);
+        var position_2 = new google.maps.LatLng(node_2.latitude, node_2.longitude);
+        var distance = google.maps.geometry.spherical.computeDistanceBetween(position_1, position_2);
+        target_edge.value = distance;
+      }
+    }
+  }
+
+  SelectDisplay();
+}
+
+function UpdateEdge(index){
+  var value = parseFloat(document.getElementById("select_val_"+String(index)).value);
+  var info = String(document.getElementById("select_info_"+String(index)).value);
+  if(isNaN(value)){
+    value = 0;
+  }
+
+  var targetEdge = edge_list[index];
+  targetEdge.value = value;
+  targetEdge.info = info;
+  SelectDisplay();
 }
 
 /* delete now selecting node */
@@ -385,10 +467,10 @@ function DeleteNode(){
       google.maps.event.clearInstanceListeners(node_list[i].marker);
       google.maps.event.addListener(node_list[i].marker, 'click', function(e) {
         SelectNode(selectIndex);
-      })
+      });
       google.maps.event.addListener(node_list[i].marker, 'dragend', function(e) {
         MoveNode(selectIndex, e.latLng);
-      })
+      });
     }
 
     selectingNode = null;
@@ -479,10 +561,161 @@ function ExportFile(){
     link.target = "_blank";
     link.download = "graph.csv";
     link.click();
-    URL.revokeObjectURL();
+    URL.revokeObjectURL(blob);
   }
 }
 
-function ImportFile(){
+/* import selected file */
+function ImportFile(inputFile){
+  if(window.FileReader){
+    var result = inputFile.files[0];
+    var reader = new FileReader();
+    reader.readAsText(result);
+    reader.addEventListener('load', function(){
+      // after reading text
+      var lines = reader.result.split('\n');
+      var i=1;
+      var index_dif = node_list.length;
 
+      // read node section
+      for(; i < lines.length; i++){
+        var cells = lines[i].split(',');
+        if(cells.length <= 1){
+          alert("Error: File column is not enough.");
+          return;
+        }else if(cells[0]==="id_1"){
+          // go to read edge section
+          break;
+        }
+
+        var lat = parseFloat(cells[0]);
+        var lng = parseFloat(cells[1]);
+        var value = 0;
+        var info = "";
+
+        if(isNaN(lat) || isNaN(lng)){
+          alert("Error: Latitude or longitude is not number.\nID:"+String(i-1));
+          return;
+        }
+
+        if(cells.length >= 3){
+          var value = parseFloat(cells[2]);
+
+          if(isNaN(value)){
+            alert("Error: Node value is not number.\nID:"+String(i-1));
+            return;
+          }
+        }
+
+        if(cells.length >= 4){
+          info +=  cells[3];
+          for(var infoIndex = 4; infoIndex < cells.length; infoIndex++){
+            info += "," + cells[infoIndex];
+          }
+        }
+
+        if(info===""){
+          var newMarker = new google.maps.Marker({  // set marker to the google maps
+            position: new google.maps.LatLng(lat, lng),
+            animation: google.maps.Animation.DROP,
+            icon: marker_icon,
+            draggable: true,
+            map: map
+          });
+        }else{
+          var newMarker = new google.maps.Marker({  // set marker to the google maps
+            position: new google.maps.LatLng(lat, lng),
+            animation: google.maps.Animation.DROP,
+            icon: marker_icon_info,
+            draggable: true,
+            map: map
+          });
+        }
+
+        var newNode = new Map_node(node_list.length, lat, lng, value, info, newMarker);
+        node_list.push(newNode);
+
+        with({index: newNode.index}){
+          google.maps.event.addListener(newMarker, 'click', function(e) {
+            SelectNode(index);
+          });
+          google.maps.event.addListener(newMarker, 'dragend', function(e) {
+            MoveNode(index, e.latLng);
+          });
+        }
+      }
+
+      i++;
+
+      // read edge section
+      for(; i < lines.length; i++){
+        var cells = lines[i].split(',');
+        if(cells.length <= 1){
+          alert("Error: File column is not enough.");
+          return;
+        }
+
+        var id_1 = parseInt(cells[0]) + index_dif;
+        var id_2 = parseInt(cells[1]) + index_dif;
+        var value = 0;
+        var info = "";
+
+        if(isNaN(id_1) || isNaN(id_2)){
+          alert("Error: Incorrect node ID in edge is detected.");
+          return;
+        }
+
+        if(id_1 >= node_list.length || id_1 < 0 || id_2 >= node_list.length || id_2 < 0){
+          alert("Error: Inputted node ID is not exist.");
+          return;
+        }
+
+        if(cells.length >= 3){
+          var value = parseFloat(cells[2]);
+
+          if(isNaN(value)){
+            alert("Error: Edge value is not number.\nID:"+String(i-1));
+            return;
+          }
+        }
+
+        if(cells.length >= 4){
+          info +=  cells[3];
+          for(var infoIndex = 4; infoIndex < cells.length; infoIndex++){
+            info += "," + cells[infoIndex];
+          }
+        }
+
+        // show in the google maps
+        var node_1 = node_list[id_1];
+        var node_2 = node_list[id_2];
+        var path = new Array();
+        path.push(new google.maps.LatLng(node_1.latitude, node_1.longitude));
+        path.push(new google.maps.LatLng(node_2.latitude, node_2.longitude));
+        var polyLineOptions = {
+            path: path,
+            strokeWeight: 6,
+            strokeColor: "#636262",
+            strokeOpacity: "0.8"
+        };
+        var polyLine = new google.maps.Polyline(polyLineOptions);
+        polyLine.setMap(map);
+
+        var newEdge = new Map_edge(node_1, node_2, value, info, polyLine);
+        edge_list.push(newEdge);
+      }
+
+      SelectDisplay();
+
+      alert("Read finished");
+    });
+  }else{
+    // There is no file reader
+    alert("This web browser cannot read file.\nPlease use different one.")
+  }
+
+  inputFile.value = "";   // reset selecting file
 }
+
+
+
