@@ -184,11 +184,11 @@ function SwitchSelectingNode(newSelectingNode){
 }
 
 function SetNode1(){
-  document.getElementById("node1Input").value = String(selectingNode.index);
+  document.getElementById("node1Input").value = EscapeHTML(String(selectingNode.index));
 }
 
 function SetNode2(){
-  document.getElementById("node2Input").value = String(selectingNode.index);
+  document.getElementById("node2Input").value = EscapeHTML(String(selectingNode.index));
 }
 
 /* set distance between node 1 and node 2 to the value input field */
@@ -325,11 +325,11 @@ function SelectDisplay(){
     document.getElementById("select_edges").innerHTML = "";
   }else{
     var index = selectingNode.index;
-    document.getElementById("select_id").textContent = String(index);
-    document.getElementById("select_lat").value = String(selectingNode.latitude);
-    document.getElementById("select_lng").value = String(selectingNode.longitude);
-    document.getElementById("select_val").value = String(selectingNode.value);
-    document.getElementById("select_info").value = String(selectingNode.info);
+    document.getElementById("select_id").textContent = EscapeHTML(String(index));
+    document.getElementById("select_lat").value = EscapeHTML(String(selectingNode.latitude));
+    document.getElementById("select_lng").value = EscapeHTML(String(selectingNode.longitude));
+    document.getElementById("select_val").value = EscapeHTML(String(selectingNode.value));
+    document.getElementById("select_info").value = EscapeHTML(String(selectingNode.info));
     var edges_display = "";
     var edge_count = 0;
 
@@ -344,11 +344,11 @@ function SelectDisplay(){
         }
 
         edges_display += '<div class="select_panel_left">ID:</div><div class="select_panel_right">'+
-        String(target_edge.node_1.index)+'-'+String(target_edge.node_2.index)+
+        EscapeHTML(String(target_edge.node_1.index))+'-'+EscapeHTML(String(target_edge.node_2.index))+
         '</div><div class="select_panel_left">Value:</div><div class="select_panel_right"><input type="text" id="select_val_'+String(i)+'" class="select_panel_right" value="'+
         String(target_edge.value)+
         '"></div><div class="select_panel_left">Info:</div><div class="select_panel_both"><textarea id="select_info_'+String(i)+'" class="select_panel_both" value="">'+
-        target_edge.info+
+        EscapeHTML(target_edge.info)+
         '</textarea></div>'+
         '<button type="button" name="deleteEdgeBtn" class="select_panel_update_button" onclick="UpdateEdge('+String(i)+')">Update Edge</button>'+
         '<button type="button" name="deleteEdgeBtn" class="select_panel_delete_button" onclick="DeleteEdge('+String(i)+')">Delete Edge</button>'
@@ -717,5 +717,16 @@ function ImportFile(inputFile){
   inputFile.value = "";   // reset selecting file
 }
 
-
+function EscapeHTML (srcStr){
+  return srcStr.replace(/[&'`"<>']/g, function(targetChar){
+    return {
+      '&': '&amp;',
+      "'": '&#x27;',
+      '`': '&#x60;',
+      '"': '&quot;',
+      '<': '&lt;',
+      '>': '&gt;',
+    }[targetChar]
+  })
+}
 
